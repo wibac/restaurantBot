@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Restaurant</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script>
+	/*starting up
+	*/
+	$.ajax({
+		url : 'http://localhost:8080/RestaurantBot/rest/service/setup',
+		type : 'GET',
+		success : function(data) {
+			console.log('set up complete');
+		}
+	});
+	function placeOrder() {
+		var orderArr = {};
+		var orderMap = [];
+		$.each($("input[name='order']:checked"), function() {
+			orderArr["id"] = $(this).val();
+			orderArr["amount"] = "1";
+			orderMap.push(orderArr);
+			alert($(this).val());
+		});
+
+		var strOrder = JSON.stringify(orderMap);
+		//var strOrder = JSON.stringify({"id" : "1","amount": "20"});
+		alert(strOrder);
+		$.ajax({
+			url : 'http://localhost:8080/RestaurantBot/rest/service',
+			contentType : 'application/json',
+			data : strOrder,
+			success : function(data) {
+				alert('Order placed');
+				$("[name='btnSummonWaiter']").show();
+				$("#divCheckBox").hide();
+			},
+			type : 'POST'
+		});
+		console.log('order placed');
+	}
+
+	function callWaiter() {
+		$.ajax({
+			url : 'http://localhost:8080/RestaurantBot/rest/service/waiter',
+			contentType : 'application/json',
+			success : function(data) {
+				$("[name='btnSummonWaiter']").hide();
+				$("#divCheckBox").show();
+				console.log("visible " + data);
+			},
+			type : 'GET'
+		});
+	}
+</script>
+</head>
+<body>
+	Welcome to our Restaurant.<br>
+	<input type="button" name="btnSummonWaiter" value="Call Waiter"
+		onclick="callWaiter()" />
+	<div id="divCheckBox" style="display: none;">
+		Choose an order from the list <br> 
+		<input type="checkbox" name="order" value="1">Chicken Burger <br> 
+		<input type="checkbox" name="order" value="2">Cheese Burger <br>
+		<input type="checkbox" name="order" value="3">Veg Burger <br>
+		<input type="checkbox" name="order" value="4">Ice water <br>
+		<input type="button" value="Place Order" onclick="placeOrder()">
+	</div>
+</body>
+</html>
