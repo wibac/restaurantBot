@@ -4,6 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Polling {
+	static Polling polling;
+	private Polling(){
+		System.out.println("Private constructor to make this class singleton");
+	}
+	
+	static Polling getPollingObj(){
+		if(polling==null){
+			polling = new Polling();
+		}
+		return polling;
+	}
 	List<Robot> lstRobot;
 	List<Order> lstOrder;
 	public List<Robot> getLstRobot() {

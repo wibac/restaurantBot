@@ -10,11 +10,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Root resource (exposed at "myresource" path)
+ * Root resource (exposed at "service" path)
  */
 @Path("/service")
 public class Service {
-	Polling polling = new Polling();
+	Polling polling = Polling.getPollingObj();
 
 	/**
 	 * Method handling HTTP GET requests. The returned object will be sent to
@@ -33,9 +33,18 @@ public class Service {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.TEXT_PLAIN })
-	public String postIt(List<Order> orders) {
-		if (orders != null)
-			System.out.println("test1" + orders.size());
+	public String placeOrder(OrderInput orders) {
+		if (orders != null){
+			System.out.println("test1" + orders.getOrders().size());
+			//set the robot status as available
+			polling.getLstRobot().get(Integer.parseInt(orders.getRobotID())).setStatus(true);
+			
+			//add the order to the list
+			for(Order order : orders.getOrders()){
+				polling.getLstOrder().add(order);
+			}
+			System.out.println("status of robot 1" + polling.getLstRobot().get(1).getId());
+		}
 		return "Got it!";
 	}
 
@@ -51,12 +60,13 @@ public class Service {
 	public void startup(){
 		System.out.println("starting up");
 		Robot robot = new Robot();
+		robot.setId("1");
 		robot.setStatus(true);
 		polling.getLstRobot().add(robot);
-		polling.getLstRobot().add(new Robot());
-		polling.getLstRobot().add(new Robot());
-		polling.getLstRobot().add(new Robot());
-		polling.getLstRobot().add(new Robot());
+		polling.getLstRobot().add(new Robot("2", true));
+		polling.getLstRobot().add(new Robot("3", true));
+		polling.getLstRobot().add(new Robot("4", true));
+		polling.getLstRobot().add(new Robot("5", true));
 		System.out.println(polling.getLstRobot().size());
 		//return "setup complete";
 	}
